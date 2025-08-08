@@ -1,0 +1,6 @@
+controllers\LoginController.class
+MainFx.class
+utils\ApiClient.class
+controllers\ProjectController.class
+controllers\DashboardController.class
+controllers\BugFormController.class
