@@ -8,14 +8,14 @@ public class BugDTO {
     private String description;
     private String status;
     private String priority;
-    private Long createdById;
+    private Long reportedById;
     private Long assignedToId;
     private Long projectId;
     private LocalDateTime createdAt;
 
     public BugDTO() {}
 
-    // getters/setters
+    // getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -31,8 +31,8 @@ public class BugDTO {
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
 
-    public Long getCreatedById() { return createdById; }
-    public void setCreatedById(Long createdById) { this.createdById = createdById; }
+    public Long getReportedById() { return reportedById; }
+    public void setReportedById(Long reportedById) { this.reportedById = reportedById; }
 
     public Long getAssignedToId() { return assignedToId; }
     public void setAssignedToId(Long assignedToId) { this.assignedToId = assignedToId; }

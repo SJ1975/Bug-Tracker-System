@@ -36,48 +36,48 @@ public class BugServiceImpl implements BugService {
         dto.setDescription(b.getDescription());
         dto.setStatus(b.getStatus());
         dto.setPriority(b.getPriority());
+        if (b.getReportedBy() != null) dto.setReportedById(b.getReportedBy().getId());
+        if (b.getAssignedTo() != null) dto.setAssignedToId(b.getAssignedTo().getId());
+        if (b.getProject() != null) dto.setProjectId(b.getProject().getId());
         dto.setCreatedAt(b.getCreatedAt());
-        if (b.getCreatedBy()!=null) dto.setCreatedById(b.getCreatedBy().getId());
-        if (b.getAssignedTo()!=null) dto.setAssignedToId(b.getAssignedTo().getId());
-        if (b.getProject()!=null) dto.setProjectId(b.getProject().getId());
         return dto;
     }
 
     private Bug toEntity(BugDTO dto) {
-        Bug bug = new Bug();
-        bug.setTitle(dto.getTitle());
-        bug.setDescription(dto.getDescription());
-        bug.setPriority(dto.getPriority() == null ? "MEDIUM" : dto.getPriority());
-        bug.setStatus(dto.getStatus() == null ? "OPEN" : dto.getStatus());
+        Bug b = new Bug();
+        b.setTitle(dto.getTitle());
+        b.setDescription(dto.getDescription());
+        b.setStatus(dto.getStatus() == null ? "OPEN" : dto.getStatus());
+        b.setPriority(dto.getPriority() == null ? "MEDIUM" : dto.getPriority());
 
-        if (dto.getCreatedById() != null) {
-            User creator = userRepository.findById(dto.getCreatedById())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getCreatedById()));
-            bug.setCreatedBy(creator);
+        if (dto.getReportedById() != null) {
+            User rep = userRepository.findById(dto.getReportedById())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getReportedById()));
+            b.setReportedBy(rep);
         }
         if (dto.getAssignedToId() != null) {
-            User assignee = userRepository.findById(dto.getAssignedToId())
+            User ass = userRepository.findById(dto.getAssignedToId())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getAssignedToId()));
-            bug.setAssignedTo(assignee);
+            b.setAssignedTo(ass);
         }
         if (dto.getProjectId() != null) {
-            Project project = projectRepository.findById(dto.getProjectId())
+            Project p = projectRepository.findById(dto.getProjectId())
                     .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + dto.getProjectId()));
-            bug.setProject(project);
+            b.setProject(p);
         }
-        return bug;
+        return b;
     }
 
     @Override
-    public BugDTO createBug(BugDTO bugDTO) {
-        Bug saved = bugRepository.save(toEntity(bugDTO));
+    public BugDTO createBug(BugDTO dto) {
+        Bug saved = bugRepository.save(toEntity(dto));
         return toDTO(saved);
     }
 
     @Override
     public BugDTO getBugById(Long id) {
         return bugRepository.findById(id).map(this::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Bug not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
     }
 
     @Override
@@ -86,18 +86,38 @@ public class BugServiceImpl implements BugService {
     }
 
     @Override
+    public BugDTO updateBug(Long id, BugDTO dto) {
+        Bug b = bugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
+        b.setTitle(dto.getTitle());
+        b.setDescription(dto.getDescription());
+        b.setStatus(dto.getStatus());
+        b.setPriority(dto.getPriority());
+        // update relations if provided
+        if (dto.getAssignedToId() != null) {
+            User ass = userRepository.findById(dto.getAssignedToId()).orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getAssignedToId()));
+            b.setAssignedTo(ass);
+        }
+        if (dto.getProjectId() != null) {
+            Project p = projectRepository.findById(dto.getProjectId()).orElseThrow(() -> new ResourceNotFoundException("Project not found: " + dto.getProjectId()));
+            b.setProject(p);
+        }
+        Bug saved = bugRepository.save(b);
+        return toDTO(saved);
+    }
+
+    @Override
     public BugDTO updateStatus(Long id, String status) {
-        Bug bug = bugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
-        bug.setStatus(status);
-        return toDTO(bugRepository.save(bug));
+        Bug b = bugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
+        b.setStatus(status);
+        return toDTO(bugRepository.save(b));
     }
 
     @Override
     public BugDTO assignBug(Long id, Long userId) {
-        Bug bug = bugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-        bug.setAssignedTo(user);
-        return toDTO(bugRepository.save(bug));
+        Bug b = bugRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug not found: " + id));
+        User u = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+        b.setAssignedTo(u);
+        return toDTO(bugRepository.save(b));
     }
 
     @Override

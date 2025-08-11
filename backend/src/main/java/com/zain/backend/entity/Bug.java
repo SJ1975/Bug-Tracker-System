@@ -6,32 +6,31 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "bugs")
 public class Bug {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable=false)
     private String title;
 
-    @Column(length=4000)
+    @Column(length = 4000)
     private String description;
 
     @Column(nullable=false)
-    private String status; // OPEN, IN_PROGRESS, FIXED, CLOSED
+    private String status; // OPEN, IN_PROGRESS, RESOLVED, CLOSED
 
     @Column(nullable=false)
-    private String priority; // LOW, MEDIUM, HIGH
+    private String priority; // LOW, MEDIUM, HIGH, CRITICAL
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @JoinColumn(name="reported_by")
+    private User reportedBy;
 
     @ManyToOne
-    @JoinColumn(name = "assigned_to")
+    @JoinColumn(name="assigned_to")
     private User assignedTo;
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name="project_id")
     private Project project;
 
     @Column(name="created_at")
@@ -39,7 +38,7 @@ public class Bug {
 
     public Bug() { this.createdAt = LocalDateTime.now(); }
 
-    // getters and setters
+    // getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -55,8 +54,8 @@ public class Bug {
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
 
-    public User getCreatedBy() { return createdBy; }
-    public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
+    public User getReportedBy() { return reportedBy; }
+    public void setReportedBy(User reportedBy) { this.reportedBy = reportedBy; }
 
     public User getAssignedTo() { return assignedTo; }
     public void setAssignedTo(User assignedTo) { this.assignedTo = assignedTo; }

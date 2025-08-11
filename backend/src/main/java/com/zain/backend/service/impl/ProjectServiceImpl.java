@@ -16,14 +16,9 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
-    }
+    public ProjectServiceImpl(ProjectRepository projectRepository) { this.projectRepository = projectRepository; }
 
-    private ProjectDTO toDTO(Project p) {
-        return new ProjectDTO(p.getId(), p.getName(), p.getDescription());
-    }
-
+    private ProjectDTO toDTO(Project p) { return new ProjectDTO(p.getId(), p.getName(), p.getDescription()); }
     private Project toEntity(ProjectDTO dto) {
         Project p = new Project();
         p.setName(dto.getName());
@@ -46,5 +41,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDTO> getAllProjects() {
         return projectRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProjectDTO updateProject(Long id, ProjectDTO dto) {
+        Project p = projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project not found: " + id));
+        p.setName(dto.getName());
+        p.setDescription(dto.getDescription());
+        Project saved = projectRepository.save(p);
+        return toDTO(saved);
+    }
+
+    @Override
+    public void deleteProject(Long id) {
+        if (!projectRepository.existsById(id)) throw new ResourceNotFoundException("Project not found: " + id);
+        projectRepository.deleteById(id);
     }
 }

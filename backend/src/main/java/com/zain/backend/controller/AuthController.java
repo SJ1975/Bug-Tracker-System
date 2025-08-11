@@ -1,4 +1,4 @@
-package com.zain.backend.util.controller;
+package com.zain.backend.controller;
 
 public class AuthController {
 }
